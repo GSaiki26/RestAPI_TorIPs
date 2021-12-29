@@ -2,19 +2,20 @@ version: '3.7'
 
 services: 
     db:
-        image: mysql
-        container_name: mysql-con
-        restart: always
-        environment: 
-            MYSQL_ROOT_PASSWORD: Proof
+        image: postgres:14
+        container_name: pg-con
+        environment:
+            POSTGRES_USER: pg_user
+            POSTGRES_PASSWORD: pg_password
+            POSTGRES_DB: pg_db
+        volumes:
+            - ./DB/init.sql:/docker-entrypoint-initdb.d/init.sql
         ports: 
-            - '3308:3306'
-        command: --default-authentication-plugin=mysql_native_password
+            - 5432:5432
         
     api:
         build: './API'
         container_name: node-con
-        restart: always
         depends_on:
             - db
         volumes:
@@ -23,11 +24,11 @@ services:
             - "2684:2684"
         links:
             - db
+
     web:
         image: php:8.0-apache
         container_name: php-con
         working_dir: /var/www/html
-        restart: always
         stdin_open: true
         tty: true
         volumes: 
